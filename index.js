@@ -13,14 +13,19 @@ function getNewIds(opt){
 			}
 		})
 		nightmare
-			.goto(`https://cloud.collectorz.com/311694/comics?viewType=list`, {
-				method: 'POST'
-			})
-			.wait('.x-collection')
-			.click('#sortDropdown')
-			.select('[name="editView"] select.form-control', 'AddedDate')
-			.select('[name="editView"] [name="order"]', 'DESC')
-			.click('[for="submit-button-sort-mobile"]')
+			.goto(`https://cloud.collectorz.com/311694/comics?viewType=list`)
+			.cookies.set([{
+				name: 'comic[collection][sorting]',
+				value: '%7B%22AddedDate%22%3A%22DESC%22%7D',
+				path: '/',
+				secure: true
+			}, {
+				name: '311694[comic][collection][lastQueryString]',
+				value: 'sort%3DAddedDate%26order%3DDESC',
+				path: '/',
+				secure: true
+			}])
+			.refresh()
 			.wait('.x-collection')
 			.evaluate(getList, opt)
 			.end()
@@ -34,7 +39,7 @@ function getNewIds(opt){
 function getList(opt, done){
 	var timeout = 3000
 	var arr = []
-	var id
+	var obj
 	// Continuous scrolling
 	setInterval(function(){
 		document.body.scrollTop += 10000
@@ -48,9 +53,17 @@ function getList(opt, done){
 		els = document.querySelector('.x-collection tbody').children
 		if(els.length - 1 >= cursor){
 			for(cursor = 0; cursor < els.length; cursor++){
-				id = els[cursor].getAttribute('rel')
-				arr.push(id)
-				if(opt.stopId && id == opt.stopId){
+				obj = {
+					id: els[cursor].getAttribute('rel'),
+					series: els[cursor].querySelector('.item-series').textContent,
+					issue: els[cursor].querySelector('.item-issue').textContent,
+					title: els[cursor].querySelector('.item-title').textContent,
+					publisher: els[cursor].querySelector('.item-publisher').textContent,
+					publishDate: els[cursor].querySelector('.item-publicationdate').textContent,
+					readDate: els[cursor].querySelector('.item-added').textContent
+				}
+				arr.push(obj)
+				if(opt.stopId && obj.id == opt.stopId){
 					return done(null, arr)
 					continue
 				}
@@ -70,8 +83,8 @@ function getList(opt, done){
 
 
 // Get comic info from IDs
-function getInfo(opt){
-	
+function getImages(opt){
+
 }
 
 
@@ -83,7 +96,7 @@ module.exports = opt => {
 		}, opt)
 		// Go!
 		getNewIds(opt)
-			.then(getInfo)
+			//.then(getImages)
 			.then(console.log)
 			.catch(console.error)
 	})
