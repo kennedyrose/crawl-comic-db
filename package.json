@@ -1,5 +1,5 @@
 {
-  "name": "backup-comic-db",
+  "name": "crawl-comic-db",
   "version": "1.0.0",
   "main": "index.js",
   "author": "Kennedy Rose <kennedy@kennedyrose.com>",

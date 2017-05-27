@@ -7,7 +7,7 @@ module.exports = (opt) => {
 		stopId: '11505577'
 	}, opt)
 	const nightmare = Nightmare({
-		show: true,
+		show: false,
 		alwaysOnTop: false,
 		openDevTools: {
 			mode: 'detach'
@@ -22,25 +22,52 @@ module.exports = (opt) => {
 		.select('[name="editView"] select.form-control', 'AddedDate')
 		.select('[name="editView"] [name="order"]', 'DESC')
 		.click('[for="submit-button-sort-mobile"]')
+		.wait('.x-collection')
 		.evaluate(getList, opt)
 		.end()
 		.then(console.log)
 		.catch(console.error)
 }
 
-function getList(opt){
-	var els = document.querySelector('.x-collection tbody').children
+function getList(opt, done){
+	var timeout = 3000
 	var arr = []
-	var i = 0
 	var id
-	for(i = 0; i < els.length; i++){
-		id = els[i].getAttribute('rel')
-		arr.push(id)
-		if(opt.stopId && id == opt.stopId){
-			continue
-		}
+
+	// Continuous scrolling
+	function scroll(){
+		document.body.scrollTop += 10000
 	}
-	return arr
+	setInterval(scroll, 500)
+
+
+
+	var timeoutProgress = 0
+	var els
+	var cursor = 0
+	function getBatch(){
+		console.log('Getting batch...')
+		els = document.querySelector('.x-collection tbody').children
+		if(els.length - 1 >= cursor){
+			for(cursor = 0; cursor < els.length; cursor++){
+				id = els[cursor].getAttribute('rel')
+				arr.push(id)
+				if(opt.stopId && id == opt.stopId){
+					return done(null, arr)
+					continue
+				}
+			}
+		}
+		else{
+			timeoutProgress++
+			if(timeoutProgress >= timeout){
+				return done(null, arr)
+			}
+		}
+		setTimeout(getBatch, 50)
+	}
+	getBatch()
+
 }
 
 module.exports()
