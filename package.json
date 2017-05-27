@@ -4,6 +4,9 @@
   "main": "index.js",
   "author": "Kennedy Rose <kennedy@kennedyrose.com>",
   "license": "MIT",
+  "scripts": {
+	  "start": "node index"
+  },
   "dependencies": {
     "dotenv": "^4.0.0",
     "nightmare": "^2.10.0"

@@ -1,17 +1,18 @@
 'use strict'
 require('dotenv').config({ silent: true })
 const Nightmare = require('nightmare')
+const nightmareOptions = {
+	show: false,
+	alwaysOnTop: false,
+	openDevTools: {
+		mode: 'detach'
+	}
+}
 
 // Get all new IDs
 function getNewIds(opt){
 	return new Promise((resolve, reject) => {
-		const nightmare = Nightmare({
-			show: false,
-			alwaysOnTop: false,
-			openDevTools: {
-				mode: 'detach'
-			}
-		})
+		const nightmare = Nightmare(nightmareOptions)
 		nightmare
 			.goto(`https://cloud.collectorz.com/311694/comics?viewType=list`)
 			.cookies.set([{
@@ -30,7 +31,7 @@ function getNewIds(opt){
 			.evaluate(getList, opt)
 			.end()
 			.then(ids => {
-				opt.ids = ids
+				opt.comics = ids
 				resolve(opt)
 			})
 			.catch(reject)
@@ -64,7 +65,7 @@ function getList(opt, done){
 				}
 				arr.push(obj)
 				if(opt.stopId && obj.id == opt.stopId){
-					return done(null, arr)
+					return callDone()
 					continue
 				}
 			}
@@ -72,10 +73,13 @@ function getList(opt, done){
 		else{
 			timeoutProgress++
 			if(timeoutProgress >= timeout){
-				return done(null, arr)
+				return callDone()
 			}
 		}
 		setTimeout(getBatch, 50)
+	}
+	function callDone(){
+		done(null, arr)
 	}
 	getBatch()
 }
@@ -84,7 +88,36 @@ function getList(opt, done){
 
 // Get comic info from IDs
 function getImages(opt){
+	let promises = Promise.resolve()
 
+	for(let i = 0, l = opt.comics.length; i < l; i++){
+		promises = promises.then(() => new Promise((resolve, reject) => {
+			const nightmare = Nightmare(nightmareOptions)
+			nightmare
+				.goto(`https://cloud.collectorz.com/311694/comics/detail/${opt.comics[i].id}`)
+				.wait('#x-cover-front')
+				.evaluate(getCoverImage)
+				.end()
+				.then(src => {
+					console.log(`Parsing ${i + 1}/${l}`)
+					if(src){
+						opt.comics[i].cover = src
+					}
+					resolve()
+				})
+				.catch(reject)
+		}))
+	}
+	return promises
+}
+function getCoverImage(){
+	var el = document.querySelector('#x-cover-front')
+	if(el){
+		return el.src
+	}
+	else{
+		return false
+	}
 }
 
 
@@ -96,8 +129,8 @@ module.exports = opt => {
 		}, opt)
 		// Go!
 		getNewIds(opt)
-			//.then(getImages)
-			.then(console.log)
+			.then(getImages)
+			.then(() => console.log(opt))
 			.catch(console.error)
 	})
 }
