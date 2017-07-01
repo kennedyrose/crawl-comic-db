@@ -1,17 +1,19 @@
 'use strict'
-require('dotenv').config({ silent: true })
 const Nightmare = require('nightmare')
 const nightmareOptions = {
 	show: false,
 	alwaysOnTop: false,
+	/*
 	openDevTools: {
 		mode: 'detach'
 	}
+	*/
 }
 
 // Get all new IDs
 function getNewIds(opt){
 	return new Promise((resolve, reject) => {
+		console.log('Getting all new IDs...')
 		const nightmare = Nightmare(nightmareOptions)
 		nightmare
 			.goto(`https://cloud.collectorz.com/311694/comics?viewType=list`)
@@ -31,6 +33,7 @@ function getNewIds(opt){
 			.evaluate(getList, opt)
 			.end()
 			.then(ids => {
+				console.log('Got IDs.')
 				opt.comics = ids
 				resolve(opt)
 			})
@@ -50,7 +53,6 @@ function getList(opt, done){
 	var els
 	var cursor = 0
 	function getBatch(){
-		console.log('Getting batch...')
 		els = document.querySelector('.x-collection tbody').children
 		if(els.length - 1 >= cursor){
 			for(cursor = 0; cursor < els.length; cursor++){
@@ -92,6 +94,9 @@ function getImages(opt){
 
 	for(let i = 0, l = opt.comics.length; i < l; i++){
 		promises = promises.then(() => new Promise((resolve, reject) => {
+			if(opt.verbose){
+				console.log(`Getting image for ${opt.comics[i].series} ${opt.comics[i].issue}`)
+			}
 			const nightmare = Nightmare(nightmareOptions)
 			nightmare
 				.goto(`https://cloud.collectorz.com/311694/comics/detail/${opt.comics[i].id}`)
@@ -99,9 +104,11 @@ function getImages(opt){
 				.evaluate(getCoverImage)
 				.end()
 				.then(src => {
-					console.log(`Parsing ${i + 1}/${l}`)
 					if(src){
 						opt.comics[i].cover = src
+					}
+					if(opt.verbose){
+						console.log(`Parsing ${i + 1}/${l}`)
 					}
 					resolve()
 				})
@@ -121,19 +128,19 @@ function getCoverImage(){
 }
 
 
-module.exports = opt => {
-	return new Promise((resole, reject) => {
+module.exports = (opt) => {
+	return new Promise((resolve, reject) => {
 		// Default options
 		opt = Object.assign({
 			stopId: '11505577'
 		}, opt)
+		if(opt.verbose){
+			console.log('Starting up...')
+		}
 		// Go!
 		getNewIds(opt)
 			.then(getImages)
-			.then(() => console.log(opt))
-			.catch(console.error)
+			.then(() => resolve(opt.comics))
+			.catch(reject)
 	})
 }
-
-
-module.exports()
