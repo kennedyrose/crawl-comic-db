@@ -65,11 +65,10 @@ function getList(opt, done){
 					publishDate: els[cursor].querySelector('.item-publicationdate').textContent,
 					readDate: els[cursor].querySelector('.item-added').textContent
 				}
-				arr.push(obj)
 				if(opt.stopId && obj.id == opt.stopId){
 					return callDone()
-					continue
 				}
+				arr.push(obj)
 			}
 		}
 		else{
