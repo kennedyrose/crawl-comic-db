@@ -16,14 +16,14 @@ function getNewIds(opt){
 		console.log('Getting all new IDs...')
 		const nightmare = Nightmare(nightmareOptions)
 		nightmare
-			.goto(`https://cloud.collectorz.com/311694/comics?viewType=list`)
+			.goto(`https://cloud.collectorz.com/${opt.userId}/comics?viewType=list`)
 			.cookies.set([{
 				name: 'comic[collection][sorting]',
 				value: '%7B%22AddedDate%22%3A%22DESC%22%7D',
 				path: '/',
 				secure: true
 			}, {
-				name: '311694[comic][collection][lastQueryString]',
+				name: '${opt.userId}[comic][collection][lastQueryString]',
 				value: 'sort%3DAddedDate%26order%3DDESC',
 				path: '/',
 				secure: true
@@ -99,7 +99,7 @@ function getImages(opt){
 			}
 			const nightmare = Nightmare(nightmareOptions)
 			nightmare
-				.goto(`https://cloud.collectorz.com/311694/comics/detail/${opt.comics[i].id}`)
+				.goto(`https://cloud.collectorz.com/${opt.userId}/comics/detail/${opt.comics[i].id}`)
 				.wait('#x-cover-front')
 				.evaluate(getCoverImage)
 				.end()
@@ -130,10 +130,6 @@ function getCoverImage(){
 
 module.exports = (opt) => {
 	return new Promise((resolve, reject) => {
-		// Default options
-		opt = Object.assign({
-			stopId: '11505577'
-		}, opt)
 		if(opt.verbose){
 			console.log('Starting up...')
 		}

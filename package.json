@@ -7,12 +7,10 @@
   "scripts": {
     "start": "node index",
     "dev": "node index",
-	 "test": "node test"
+    "test": "node test"
   },
   "dependencies": {
     "nightmare": "^2.10.0"
   },
-  "devDependencies": {
-    "dotenv": "^4.0.0"
-  }
+  "devDependencies": {}
 }

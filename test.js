@@ -1,10 +1,9 @@
 'use strict'
-require('dotenv').config({ silent: true })
 const crawler = require('./index')
-
 crawler({
 		verbose: true,
-		stopId: '11805642'
+		stopId: '11805642',
+		userId: '311694'
 	})
 	.then(console.log)
 	.catch(console.error)
