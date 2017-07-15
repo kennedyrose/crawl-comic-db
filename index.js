@@ -3,12 +3,10 @@ const Nightmare = require('nightmare')
 const nightmareOptions = {
 	show: true,
 	alwaysOnTop: false,
-	executionTimeout: false
-	/*
+	executionTimeout: false,
 	openDevTools: {
 		mode: 'detach'
 	}
-	*/
 }
 
 // Get all new IDs
@@ -54,6 +52,7 @@ function getList(opt, done){
 	var els
 	var cursor = 0
 	function getBatch(){
+		console.log('Getting batch...')
 		els = document.querySelector('.x-collection tbody').children
 		if(els.length - 1 >= cursor){
 			for(cursor = 0; cursor < els.length; cursor++){
