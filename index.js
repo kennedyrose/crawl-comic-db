@@ -1,8 +1,9 @@
 'use strict'
 const Nightmare = require('nightmare')
 const nightmareOptions = {
-	show: false,
+	show: true,
 	alwaysOnTop: false,
+	executionTimeout: false
 	/*
 	openDevTools: {
 		mode: 'detach'
