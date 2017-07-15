@@ -3,7 +3,7 @@ const Nightmare = require('nightmare')
 const nightmareOptions = {
 	show: true,
 	alwaysOnTop: false,
-	executionTimeout: false,
+	executionTimeout: 3000000000,
 	openDevTools: {
 		mode: 'detach'
 	}
@@ -56,11 +56,13 @@ function getList(opt, done){
 		els = document.querySelector('.x-collection tbody').children
 		if(els.length - 1 >= cursor){
 			for(cursor = 0; cursor < els.length; cursor++){
+				var title = els[cursor].querySelector('.item-title').textContent
+				console.log('Found: ' + title)
 				obj = {
 					id: els[cursor].getAttribute('rel'),
 					series: els[cursor].querySelector('.item-series').textContent,
 					issue: els[cursor].querySelector('.item-issue').textContent,
-					title: els[cursor].querySelector('.item-title').textContent,
+					title: title,
 					publisher: els[cursor].querySelector('.item-publisher').textContent,
 					publishDate: els[cursor].querySelector('.item-publicationdate').textContent,
 					readDate: els[cursor].querySelector('.item-added').textContent
