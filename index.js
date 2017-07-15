@@ -1,12 +1,14 @@
 'use strict'
 const Nightmare = require('nightmare')
 const nightmareOptions = {
-	show: true,
+	show: false,
 	alwaysOnTop: false,
-	executionTimeout: 3000000000,
+	executionTimeout: false,
+	/*
 	openDevTools: {
 		mode: 'detach'
 	}
+	*/
 }
 
 // Get all new IDs
@@ -40,7 +42,7 @@ function getNewIds(opt){
 	})
 }
 function getList(opt, done){
-	var timeout = 3000
+	var timeout = 90
 	var arr = []
 	var obj
 	// Continuous scrolling
@@ -55,6 +57,7 @@ function getList(opt, done){
 		console.log('Getting batch...')
 		els = document.querySelector('.x-collection tbody').children
 		if(els.length - 1 >= cursor){
+			timeoutProgress = 0
 			for(cursor = 0; cursor < els.length; cursor++){
 				var title = els[cursor].querySelector('.item-title').textContent
 				console.log('Found: ' + title)
@@ -75,6 +78,7 @@ function getList(opt, done){
 		}
 		else{
 			timeoutProgress++
+			console.log('Nothing new found ('+timeoutProgress+')...')
 			if(timeoutProgress >= timeout){
 				return callDone()
 			}
