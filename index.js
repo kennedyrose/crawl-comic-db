@@ -97,6 +97,8 @@ function getList(opt, done){
 function getImages(opt){
 	let promises = Promise.resolve()
 
+	opt.comics.reverse()
+
 	for(let i = 0, l = opt.comics.length; i < l; i++){
 		promises = promises.then(() => new Promise((resolve, reject) => {
 			if(opt.verbose){
