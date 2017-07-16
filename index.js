@@ -118,9 +118,11 @@ function getImages(opt){
 						console.log(`Parsing ${i + 1}/${l}`)
 					}
 					if('cb' in opt){
-						opt.cb(opt.comics[i])
+						opt.cb(opt.comics[i], resolve)
 					}
-					resolve()
+					else{
+						resolve()
+					}
 				})
 				.catch(reject)
 		}))
