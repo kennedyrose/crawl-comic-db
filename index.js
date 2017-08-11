@@ -92,12 +92,37 @@ function getList(opt, done){
 }
 
 
+// Sorts comics by date, series, then issue
+function sortComics(a, b){
+	if(a.readDate < b.readDate){
+		return -1
+	}
+	if(a.readDate > b.readDate){
+		return 1
+	}
+	// If date is the same
+	if(a.series < b.series){
+		return -1
+	}
+	if(a.series > b.series){
+		return 1
+	}
+	// If date and series are the same
+	if(a.issue < b.issue){
+		return -1
+	}
+	if(a.issue > b.issue){
+		return 1
+	}
+	return 0
+}
+
 
 // Get comic info from IDs
 function getImages(opt){
 	let promises = Promise.resolve()
 
-	opt.comics.reverse()
+	opt.comics.sort(sortComics)
 
 	for(let i = 0, l = opt.comics.length; i < l; i++){
 		promises = promises.then(() => new Promise((resolve, reject) => {
