@@ -122,7 +122,7 @@ function sortComics(a, b){
 function getImages(opt){
 	let promises = Promise.resolve()
 
-	opt.comics.sort(sortComics)
+	opt.comics.reverse()
 
 	for(let i = 0, l = opt.comics.length; i < l; i++){
 		promises = promises.then(() => new Promise((resolve, reject) => {
